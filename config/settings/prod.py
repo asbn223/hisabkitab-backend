@@ -50,3 +50,8 @@ LOGGING = {
         },
     },
 }
+
+INSTALLED_APPS += ['whitenoise.runserver_nostatic']
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
