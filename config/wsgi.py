@@ -1,12 +1,12 @@
-# config/wsgi.py
 import os
 from pathlib import Path
 import environ
 
-# Load env vars before Django imports
-env = environ.Env()
+# Load .env if it exists (local dev), otherwise OS env vars (Render) are already available
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'), overwrite=True)
+env_file = os.path.join(BASE_DIR, '.env')
+if os.path.exists(env_file):
+    environ.Env.read_env(env_file, overwrite=True)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.prod')
 

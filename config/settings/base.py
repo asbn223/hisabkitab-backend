@@ -3,18 +3,20 @@ import os
 from pathlib import Path
 from decimal import ROUND_HALF_UP
 from environ import environ
-env = environ.Env()
-
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Try to load .env file if it exists (local development)
 env_file = os.path.join(BASE_DIR, '.env')
 if os.path.exists(env_file):
     environ.Env.read_env(env_file, overwrite=True)
 
-SECRET_KEY = env.str('SECRET_KEY')
-FIELD_ENCRYPTION_KEY = env.str('FIELD_ENCRYPTION_KEY')
+# Initialize env — this will read from os.environ automatically
+env = environ.Env()
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool('DEBUG')
+# Now these will work whether from .env file or OS env vars
+FIELD_ENCRYPTION_KEY = env.str('FIELD_ENCRYPTION_KEY')
+SECRET_KEY = env.str('SECRET_KEY')
+DEBUG = env.bool('DEBUG', default=False)
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS')
 
