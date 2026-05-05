@@ -1,0 +1,66 @@
+<!-- templates/reports/trial_balance.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Trial Balance</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 10pt; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background-color: #f0f0f0; }
+        .text-right { text-align: right; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .totals { font-weight: bold; background-color: #f9f9f9; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{{ tenant.name }}</h1>
+        <h2>Trial Balance</h2>
+        <p>Period: {{ data.start_date }} to {{ data.end_date }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Account Code</th>
+                <th>Account Name</th>
+                <th class="text-right">Opening</th>
+                <th class="text-right">Debit</th>
+                <th class="text-right">Credit</th>
+                <th class="text-right">Closing</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for account in data.accounts %}
+            <tr>
+                <td>{{ account.account_code }}</td>
+                <td>{{ account.account_name }}</td>
+                <td class="text-right">{{ account.opening_balance|floatformat:2 }}</td>
+                <td class="text-right">{{ account.period_debit|floatformat:2 }}</td>
+                <td class="text-right">{{ account.period_credit|floatformat:2 }}</td>
+                <td class="text-right">{{ account.closing_balance|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr class="totals">
+                <td colspan="3">TOTAL</td>
+                <td class="text-right">{{ data.total_debit|floatformat:2 }}</td>
+                <td class="text-right">{{ data.total_credit|floatformat:2 }}</td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <p style="margin-top: 20px; font-size: 9pt; color: #666;">
+        Generated on: {{ generated_at|date:"Y-m-d H:i" }}
+        {% if data.is_balanced %}
+        | Status: <span style="color: green;">✓ Balanced</span>
+        {% else %}
+        | Status: <span style="color: red;">✗ Unbalanced</span>
+        {% endif %}
+    </p>
+</body>
+</html>

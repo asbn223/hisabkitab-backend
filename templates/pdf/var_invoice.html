@@ -1,0 +1,186 @@
+<!-- templates/pdf/vat_invoice.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Invoice {{ invoice.invoice_number }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        body {
+            font-family: 'Kalimati', 'Arial', sans-serif;
+            font-size: 12pt;
+            line-height: 1.4;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .company-name {
+            font-size: 24pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .invoice-title {
+            font-size: 18pt;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .info-grid {
+            display: table;
+            width: 100%;
+            margin-bottom: 30px;
+        }
+        .info-cell {
+            display: table-cell;
+            width: 50%;
+        }
+        table.items {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        table.items th, table.items td {
+            border: 1px solid #333;
+            padding: 8px;
+            text-align: left;
+        }
+        table.items th {
+            background-color: #f0f0f0;
+        }
+        .totals {
+            width: 40%;
+            margin-left: 60%;
+            border-top: 2px solid #333;
+        }
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .grand-total {
+            font-weight: bold;
+            font-size: 14pt;
+            border-top: 2px solid #333;
+            padding-top: 10px;
+        }
+        .qr-code {
+            position: absolute;
+            bottom: 2cm;
+            right: 2cm;
+            width: 100px;
+            height: 100px;
+        }
+        .footer {
+            margin-top: 50px;
+            font-size: 10pt;
+            color: #666;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-name">{{ tenant.name }}</div>
+        <div>{{ tenant.address }}</div>
+        <div>PAN: {{ tenant.pan }}</div>
+        {% if tenant.vat_number %}
+        <div>VAT: {{ tenant.vat_number }}</div>
+        {% endif %}
+    </div>
+
+    <div class="invoice-title">TAX INVOICE (VAT Bill)</div>
+
+    <div class="info-grid">
+        <div class="info-cell">
+            <strong>Bill To:</strong><br>
+            {{ invoice.customer_name }}<br>
+            {% if invoice.customer_address %}{{ invoice.customer_address }}<br>{% endif %}
+            {% if invoice.customer_pan %}PAN: {{ invoice.customer_pan }}{% endif %}
+        </div>
+        <div class="info-cell" style="text-align: right;">
+            <strong>Invoice Number:</strong> {{ invoice.invoice_number }}<br>
+            <strong>Date (AD):</strong> {{ invoice.date }}<br>
+            <strong>Date (BS):</strong> {{ invoice.bs_date }}<br>
+            <strong>Due Date:</strong> {{ invoice.due_date|default:"Immediate" }}
+        </div>
+    </div>
+
+    <table class="items">
+        <thead>
+            <tr>
+                <th>S.N.</th>
+                <th>Description</th>
+                <th>Qty</th>
+                <th>Rate</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for line in lines %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ line.item_name }}{% if line.description %}<br><small>{{ line.description }}</small>{% endif %}</td>
+                <td>{{ line.quantity }} {{ line.unit }}</td>
+                <td style="text-align: right;">{{ line.unit_price }}</td>
+                <td style="text-align: right;">{{ line.line_total }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="totals">
+        <div class="totals-row">
+            <span>Subtotal:</span>
+            <span>{{ invoice.subtotal }}</span>
+        </div>
+        {% if invoice.discount_amount > 0 %}
+        <div class="totals-row">
+            <span>Discount:</span>
+            <span>{{ invoice.discount_amount }}</span>
+        </div>
+        {% endif %}
+        <div class="totals-row">
+            <span>Taxable Amount:</span>
+            <span>{{ invoice.taxable_amount }}</span>
+        </div>
+        {% if invoice.is_vat_bill %}
+        <div class="totals-row">
+            <span>VAT ({{ lines.0.vat_rate }}%):</span>
+            <span>{{ invoice.vat_amount }}</span>
+        </div>
+        {% endif %}
+        <div class="totals-row grand-total">
+            <span>Grand Total:</span>
+            <span>NPR {{ invoice.total_amount }}</span>
+        </div>
+        <div class="totals-row">
+            <span>Amount Paid:</span>
+            <span>{{ invoice.paid_amount }}</span>
+        </div>
+        <div class="totals-row">
+            <span>Amount Due:</span>
+            <span>{{ invoice.total_amount|sub:invoice.paid_amount }}</span>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>Terms & Conditions:</strong><br>
+        {{ invoice.terms_and_conditions|default:"Payment due within 30 days. Subject to Nepali law." }}</p>
+        <p style="text-align: center; margin-top: 30px;">
+            <strong>This is a computer generated invoice.</strong>
+        </p>
+    </div>
+
+    <div class="qr-code">
+        <!-- QR Code would be rendered here -->
+        <img src="data:image/png;base64,{{ qr_code_image }}" alt="QR">
+    </div>
+</body>
+</html>
