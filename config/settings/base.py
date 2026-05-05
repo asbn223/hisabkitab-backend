@@ -3,10 +3,12 @@ import os
 from pathlib import Path
 from decimal import ROUND_HALF_UP
 from environ import environ
+env = environ.Env()
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'), overwrite=True)
-env = environ.Env()
+env_file = os.path.join(BASE_DIR, '.env')
+if os.path.exists(env_file):
+    environ.Env.read_env(env_file, overwrite=True)
 
 SECRET_KEY = env.str('SECRET_KEY')
 FIELD_ENCRYPTION_KEY = env.str('FIELD_ENCRYPTION_KEY')

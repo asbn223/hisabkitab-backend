@@ -12,7 +12,6 @@ services:
     buildCommand: "./build.sh"
     startCommand: "gunicorn config.wsgi:application"
     envVars:
-      # Django Core
       - key: DEBUG
         value: "False"
       - key: SECRET_KEY
@@ -21,54 +20,39 @@ services:
         value: "hisabkitab-backend.onrender.com,localhost,127.0.0.1"
       - key: DJANGO_SETTINGS_MODULE
         value: "config.settings.prod"
-
-      # Database (your actual Render PostgreSQL URL)
       - key: DATABASE_URL
         value: "postgresql://db_user:z3cEB7LL0eEYsPrRDRhwq2RBc8Gf0tXY@dpg-d7snctkm0tmc73dbevgg-a/nepali_accounting"
-
-      # Redis & Celery (Redis Cloud instance)
       - key: REDIS_URL
         value: "redis://redis-13007.crce281.ap-south-1-3.ec2.cloud.redislabs.com:13007/0"
       - key: CELERY_BROKER_URL
         value: "redis://redis-13007.crce281.ap-south-1-3.ec2.cloud.redislabs.com:13007/1"
       - key: CELERY_RESULT_BACKEND
         value: "redis://redis-13007.crce281.ap-south-1-3.ec2.cloud.redislabs.com:13007/2"
-
-      # Security
       - key: SECURE_SSL_REDIRECT
         value: "True"
-
-      # Payment Gateways
       - key: ESEWA_MERCHANT_ID
         value: "EPAYTEST"
       - key: ESEWA_SECRET_KEY
         value: "8gBm/:&EnhH.1/q"
       - key: ESEWA_BASE_URL
         value: "https://epay.esewa.com.np/api/epay/main/v2/form"
-
       - key: KHALTI_SECRET_KEY
         value: "live_secret_key_here"
       - key: KHALTI_PUBLIC_KEY
         value: "live_public_key_here"
       - key: KHALTI_BASE_URL
         value: "https://khalti.com/api/v2"
-
       - key: FONEPAY_MERCHANT_ID
         sync: false
       - key: FONEPAY_SECRET_KEY
         sync: false
-
       - key: CONNECTIPS_MERCHANT_ID
         sync: false
       - key: CONNECTIPS_APP_ID
         sync: false
       - key: CONNECTIPS_APP_SECRET
         sync: false
-
-      # Encryption
       - key: FIELD_ENCRYPTION_KEY
         value: "wm34dhK0OYgsqQv3fstCxCuGp3SBurKZGMvZfAxCpSE="
-
-      # Gunicorn
       - key: WEB_CONCURRENCY
         value: "4"
